@@ -75,6 +75,18 @@ bob.lost_to!(alice)  # Same effect as alice.beat!(bob)
 
 # Record a draw
 alice.draw_with!(bob)
+
+alice.elo_rating  # => 1200 (no change for equal ratings)
+bob.elo_rating    # => 1200 (no change for equal ratings)
+
+# Example with different ratings
+charlie = Player.create!(name: "Charlie")
+charlie.elo_ranking.update!(rating: 1400)  # Charlie is higher rated
+
+charlie.draw_with!(alice)  # Draw between 1400 vs 1200
+
+charlie.elo_rating  # => 1384 (lost 16 points - draw hurts higher rated player)
+alice.elo_rating    # => 1216 (gained 16 points - draw helps lower rated player)
 ```
 
 ### Multiplayer Matches (Ranked)
