@@ -256,4 +256,31 @@ RSpec.describe EloRankable do
       }.to perform_under(100).ms
     end
   end
+
+  describe 'edge cases' do
+    it 'handles very high ratings correctly' do
+      player1.elo_ranking.update!(rating: 3000)
+      player2.elo_ranking.update!(rating: 800)
+      
+      expect { player1.beat!(player2) }.not_to raise_error
+      # High-rated player should gain very little from beating low-rated player
+      expect(player1.elo_rating).to be < 3010
+    end
+
+    it 'handles negative ratings gracefully' do
+      player1.elo_ranking.update!(rating: 100)
+      player2.elo_ranking.update!(rating: 2000)
+      
+      player1.lost_to!(player2)
+      expect(player1.elo_rating).to be >= 0  # Should not go negative
+    end
+
+    it 'handles self-match attempts' do
+      expect { player1.beat!(player1) }.to raise_error(ArgumentError)
+    end
+
+    it 'handles nil players' do
+      expect { player1.beat!(nil) }.to raise_error(ArgumentError)
+    end
+  end
 end

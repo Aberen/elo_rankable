@@ -29,15 +29,18 @@ module EloRankable
 
       # Domain-style DSL methods
       def beat!(other_player)
-        Calculator.update_ratings_for_win(self, other_player)
+        validate_opponent!(other_player)
+        EloRankable::Calculator.update_ratings_for_win(self, other_player)
       end
 
       def lost_to!(other_player)
-        Calculator.update_ratings_for_win(other_player, self)
+        validate_opponent!(other_player)
+        EloRankable::Calculator.update_ratings_for_win(other_player, self)
       end
 
       def draw_with!(other_player)
-        Calculator.update_ratings_for_draw(self, other_player)
+        validate_opponent!(other_player)
+        EloRankable::Calculator.update_ratings_for_draw(self, other_player)
       end
 
       # Aliases for clarity
@@ -46,6 +49,12 @@ module EloRankable
       alias elo_draw_with! draw_with!
 
       private
+
+      def validate_opponent!(other_player)
+        raise ArgumentError, "Cannot play against nil" if other_player.nil?
+        raise ArgumentError, "Cannot play against yourself" if other_player == self
+        raise ArgumentError, "Opponent must respond to elo_ranking" unless other_player.respond_to?(:elo_ranking)
+      end
 
       def create_elo_ranking!
         super(
