@@ -1,9 +1,9 @@
 PATH
   remote: .
   specs:
-    elo_rankable (0.1.2)
-      activerecord (>= 6.0, < 8.0)
-      activesupport (>= 6.0, < 8.0)
+    elo_rankable (0.2.0)
+      activerecord (>= 6.0, < 9.0)
+      activesupport (>= 6.0, < 9.0)
 
 GEM
   remote: https://rubygems.org/
