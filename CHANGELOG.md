@@ -5,7 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.1.1] - 2025-08-07
+
+### Fixed
+- Added proper input validation to `beat!`, `lost_to!`, and `draw_with!` methods
+- Fixed SQLite3 gem version compatibility with ActiveRecord 8.0
+
+### Added
+- Comprehensive edge case testing for high ratings, negative ratings, and invalid inputs
+- Performance tests for leaderboard queries and association loading
+- Input validation with descriptive error messages for nil players and self-matches
+
+### Changed
+- Improved error handling with ArgumentError exceptions for invalid match scenarios
+- Enhanced test suite with better coverage of edge cases and error conditions
 
 ## [0.1.0] - 2025-08-06
 
