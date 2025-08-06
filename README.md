@@ -138,6 +138,14 @@ player.games_played    # Number of games played
 player.elo_ranking     # Access to the full EloRanking record
 ```
 
+### Accessing K-Factor Values
+
+```ruby
+# Get the K-factor for a specific rating
+EloRankable.config.k_factor_for(1500)  # => 32
+EloRankable.config.k_factor_for(2200)  # => 20
+```
+
 ### Leaderboards and Scopes
 
 ```ruby
@@ -246,6 +254,29 @@ charlie.beat!(alice)
 # Charlie: 1189 + 21 = 1210 (gained 21 points - major upset)
 # Alice: 1411 - 21 = 1390 (lost 21 points)
 ```
+
+
+## Error Handling
+
+The gem provides comprehensive validation with specific error types:
+
+### EloRankable::InvalidMatchError
+- Thrown when match requirements aren't met (e.g., less than 2 players)
+- Winner appears in losers list
+
+### ArgumentError
+- Nil players/opponents
+- Duplicate players in arrays
+- Players that don't respond to `elo_ranking`
+- Playing against yourself or destroyed records
+
+```ruby
+# Examples that will raise errors:
+alice.beat!(nil)                    # ArgumentError: Cannot play against nil
+alice.beat!(alice)                  # ArgumentError: Cannot play against yourself
+EloRankable.record_multiplayer_match([alice])  # InvalidMatchError: Need at least 2 players
+```
+
 
 ## Database Schema
 
