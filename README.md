@@ -157,7 +157,7 @@ The K-factor determines how much ratings change after each match. You can use a 
 
 ```ruby
 EloRankable.configure do |config|
-  config.k_factor_for = 32  # Everyone uses K=32
+  config.k_factor_for = 32
 end
 ```
 
