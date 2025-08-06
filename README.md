@@ -1,5 +1,7 @@
 # elo_rankable
 
+[![Gem Version](https://badge.fury.io/rb/elo_rankable.svg?icon=si%3Arubygems)](https://badge.fury.io/rb/elo_rankable)
+
 A Ruby gem that adds Elo rating capabilities to any ActiveRecord model using a simple `has_elo_ranking` declaration. It stores ratings in a separate `EloRanking` model to keep your host model clean, and provides domain-style methods for updating rankings after matches.
 
 ## Features
