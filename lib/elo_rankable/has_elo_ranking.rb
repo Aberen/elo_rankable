@@ -59,9 +59,7 @@ module EloRankable
         raise ArgumentError, 'Opponent must respond to elo_ranking' unless other_player.respond_to?(:elo_ranking)
 
         # Check if the opponent is destroyed/deleted
-        if other_player.respond_to?(:destroyed?) && other_player.destroyed?
-          raise ArgumentError, 'Cannot play against a destroyed record'
-        end
+        raise ArgumentError, 'Cannot play against a destroyed record' if other_player.respond_to?(:destroyed?) && other_player.destroyed?
 
         # Get the elo_ranking once and validate it
         opponent_ranking = other_player.elo_ranking
