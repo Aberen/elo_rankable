@@ -5,7 +5,7 @@ module EloRankable
     class << self
       # Calculate expected score for player A against player B
       def expected_score(rating_a, rating_b)
-        1.0 / (1.0 + 10.0**((rating_b - rating_a) / 400.0))
+        1.0 / (1.0 + (10.0**((rating_b - rating_a) / 400.0)))
       end
 
       # Update ratings after a match where player1 beats player2
@@ -24,8 +24,8 @@ module EloRankable
         loser_k = loser_rating.k_factor
 
         # Winner gets 1 point, loser gets 0 points
-        winner_new_rating = winner_rating.rating + winner_k * (1 - winner_expected)
-        loser_new_rating = loser_rating.rating + loser_k * (0 - loser_expected)
+        winner_new_rating = winner_rating.rating + (winner_k * (1 - winner_expected))
+        loser_new_rating = loser_rating.rating + (loser_k * (0 - loser_expected))
 
         update_ranking(winner_rating, winner_new_rating)
         update_ranking(loser_rating, loser_new_rating)
@@ -47,8 +47,8 @@ module EloRankable
         player2_k = player2_rating.k_factor
 
         # Both players get 0.5 points in a draw
-        player1_new_rating = player1_rating.rating + player1_k * (0.5 - player1_expected)
-        player2_new_rating = player2_rating.rating + player2_k * (0.5 - player2_expected)
+        player1_new_rating = player1_rating.rating + (player1_k * (0.5 - player1_expected))
+        player2_new_rating = player2_rating.rating + (player2_k * (0.5 - player2_expected))
 
         update_ranking(player1_rating, player1_new_rating)
         update_ranking(player2_rating, player2_new_rating)

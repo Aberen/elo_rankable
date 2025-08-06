@@ -1,0 +1,35 @@
+AllCops:
+  NewCops: enable
+  SuggestExtensions: false
+  TargetRubyVersion: 2.7
+
+# Disable some overly strict metrics for gem development
+Metrics/AbcSize:
+  Max: 30
+
+Metrics/MethodLength:
+  Max: 15
+
+Metrics/CyclomaticComplexity:
+  Max: 10
+
+Metrics/PerceivedComplexity:
+  Max: 10
+
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*'
+    - '*.gemspec'
+
+# Allow longer variable names with numbers for test clarity
+Naming/VariableNumber:
+  EnforcedStyle: normalcase
+
+# Allow predicate method names like has_elo_ranking for ActiveRecord-style methods
+Naming/PredicatePrefix:
+  AllowedMethods:
+    - has_elo_ranking
+
+# Documentation is not always necessary for internal classes
+Style/Documentation:
+  Enabled: false

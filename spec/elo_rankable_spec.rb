@@ -185,10 +185,10 @@ RSpec.describe EloRankable do
     end
 
     it 'limits top rated players' do
-      top_2 = Player.top_rated(2)
-      expect(top_2.count).to eq(2)
-      expect(top_2.first).to eq(player1)
-      expect(top_2.second).to eq(player3)
+      top_two = Player.top_rated(2)
+      expect(top_two.count).to eq(2)
+      expect(top_two.first).to eq(player1)
+      expect(top_two.second).to eq(player3)
     end
   end
 
