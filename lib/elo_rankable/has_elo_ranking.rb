@@ -16,7 +16,10 @@ module EloRankable
 
     module InstanceMethods
       def elo_ranking
-        super || create_elo_ranking!
+        super || self.create_elo_ranking!(
+          rating: EloRankable.config.base_rating,
+          games_played: 0
+        )
       end
 
       def elo_rating
@@ -54,13 +57,6 @@ module EloRankable
         raise ArgumentError, "Cannot play against nil" if other_player.nil?
         raise ArgumentError, "Cannot play against yourself" if other_player == self
         raise ArgumentError, "Opponent must respond to elo_ranking" unless other_player.respond_to?(:elo_ranking)
-      end
-
-      def create_elo_ranking!
-        super(
-          rating: EloRankable.config.base_rating,
-          games_played: 0
-        )
       end
     end
   end
