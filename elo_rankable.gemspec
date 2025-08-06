@@ -5,12 +5,12 @@ require_relative 'lib/elo_rankable/version'
 Gem::Specification.new do |spec|
   spec.name = 'elo_rankable'
   spec.version = EloRankable::VERSION
-  spec.authors = ['Your Name']
-  spec.email = ['your.email@example.com']
+  spec.authors = ['Aberen']
+  spec.email = ['nijoergensen@gmail.com']
 
   spec.summary = 'Add Elo rating capabilities to any ActiveRecord model'
   spec.description = 'A Ruby gem that adds Elo rating capabilities to any ActiveRecord model using a has_elo_ranking declaration.'
-  spec.homepage = 'https://github.com/yourusername/elo_rankable'
+  spec.homepage = 'https://github.com/Aberen/elo_rankable'
   spec.license = 'MIT'
   spec.required_ruby_version = '>= 2.7.0'
 
