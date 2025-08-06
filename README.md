@@ -246,13 +246,13 @@ alice.beat!(bob)
 
 # Alice (1400) vs Charlie (1200) - Alice favored
 alice.beat!(charlie)
-# Alice: 1400 + 11 = 1411 (gained 11 points - expected to win)
-# Charlie: 1200 - 11 = 1189 (lost 11 points)
+# Alice: 1400 + 8 = 1408 (gained 8 points - expected to win)
+# Charlie: 1200 - 8 = 1192 (lost 8 points)
 
-# Charlie (1189) beats Alice (1411) - upset!
+# Charlie (1192) beats Alice (1408) - upset!
 charlie.beat!(alice)
-# Charlie: 1189 + 21 = 1210 (gained 21 points - major upset)
-# Alice: 1411 - 21 = 1390 (lost 21 points)
+# Charlie: 1192 + 24 = 1216 (gained 24 points - major upset)
+# Alice: 1408 - 24 = 1384 (lost 24 points)
 ```
 
 
