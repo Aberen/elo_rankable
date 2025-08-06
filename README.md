@@ -262,7 +262,7 @@ charlie.beat!(alice)
 
 The gem provides comprehensive validation with specific error types:
 
-### EloRankable::InvalidMatchError
+### InvalidMatchError
 - Thrown when match requirements aren't met (e.g., less than 2 players)
 - Winner appears in losers list
 
