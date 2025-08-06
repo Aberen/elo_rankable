@@ -85,8 +85,8 @@ charlie.elo_ranking.update!(rating: 1400)  # Charlie is higher rated
 
 charlie.draw_with!(alice)  # Draw between 1400 vs 1200
 
-charlie.elo_rating  # => 1384 (lost 16 points - draw hurts higher rated player)
-alice.elo_rating    # => 1216 (gained 16 points - draw helps lower rated player)
+charlie.elo_rating  # => 1392 (lost 8 points - draw hurts higher rated player)
+alice.elo_rating    # => 1208 (gained 8 points - draw helps lower rated player)
 ```
 
 ### Multiplayer Matches (Ranked)
