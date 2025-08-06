@@ -9,6 +9,20 @@ require_relative 'elo_rankable/elo_ranking'
 require_relative 'elo_rankable/calculator'
 require_relative 'elo_rankable/has_elo_ranking'
 
+# EloRankable provides methods for recording Elo-based ranking results for multiplayer matches,
+# winner-vs-all matches, and draws between players. It expects player objects to respond to
+# `elo_ranking` and `beat!` methods, and includes configuration support.
+#
+# Example usage:
+#   EloRankable.record_multiplayer_match([player1, player2, player3])
+#   EloRankable.record_winner_vs_all(winner, [loser1, loser2])
+#   EloRankable.record_draw(player1, player2)
+#
+# Configuration can be customized via EloRankable.configure.
+#
+# Errors:
+#   EloRankable::InvalidMatchError - Raised for invalid match scenarios.
+#   ArgumentError - Raised for invalid arguments or player objects.
 module EloRankable
   class Error < StandardError; end
   class InvalidMatchError < Error; end
