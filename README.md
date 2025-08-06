@@ -1,4 +1,4 @@
-# EloRankable
+# elo_rankable
 
 A Ruby gem that adds Elo rating capabilities to any ActiveRecord model using a simple `has_elo_ranking` declaration. It stores ratings in a separate `EloRanking` model to keep your host model clean, and provides domain-style methods for updating rankings after matches.
 
@@ -259,7 +259,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/yourusername/elo_rankable.
+Bug reports and pull requests are welcome on GitHub at https://github.com/aberen/elo_rankable.
 
 ## License
 
