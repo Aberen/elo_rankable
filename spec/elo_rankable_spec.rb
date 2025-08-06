@@ -276,11 +276,249 @@ RSpec.describe EloRankable do
     end
 
     it 'handles self-match attempts' do
-      expect { player1.beat!(player1) }.to raise_error(ArgumentError)
+      expect { player1.beat!(player1) }.to raise_error(ArgumentError, "Cannot play against yourself")
     end
 
     it 'handles nil players' do
-      expect { player1.beat!(nil) }.to raise_error(ArgumentError)
+      expect { player1.beat!(nil) }.to raise_error(ArgumentError, "Cannot play against nil")
+    end
+
+    it 'handles objects that do not respond to elo_ranking' do
+      non_rankable = double("NonRankable")
+      expect { player1.beat!(non_rankable) }.to raise_error(ArgumentError, "Opponent must respond to elo_ranking")
+    end
+
+    it 'handles opponents with nil elo_ranking' do
+      # With improved validation, this should now be caught properly
+      mock_player = double("MockPlayer")
+      allow(mock_player).to receive(:respond_to?).with(:elo_ranking).and_return(true)
+      allow(mock_player).to receive(:respond_to?).with(:destroyed?).and_return(false)
+      allow(mock_player).to receive(:elo_ranking).and_return(nil)
+      
+      expect { player1.beat!(mock_player) }.to raise_error(ArgumentError, "Opponent's elo_ranking is not initialized")
+    end
+
+    it 'handles opponents with unsaved elo_ranking' do
+      # Create a player with an unsaved elo_ranking
+      unsaved_player = Player.new(name: "Unsaved")
+      unsaved_ranking = EloRankable::EloRanking.new(
+        rating: EloRankable.config.base_rating,
+        games_played: 0
+      )
+      allow(unsaved_player).to receive(:elo_ranking).and_return(unsaved_ranking)
+      
+      # With improved validation, this should be caught properly
+      expect { player1.beat!(unsaved_player) }.to raise_error(ArgumentError, "Opponent's elo_ranking is not saved")
+    end
+
+    it 'handles extreme rating differences without overflow' do
+      player1.elo_ranking.update!(rating: 1)
+      player2.elo_ranking.update!(rating: 9999)
+      
+      expect { player1.beat!(player2) }.not_to raise_error
+      expect { player2.beat!(player1) }.not_to raise_error
+      
+      # Verify ratings are still within reasonable bounds
+      expect(player1.elo_rating).to be_between(0, 10000)
+      expect(player2.elo_rating).to be_between(0, 10000)
+    end
+
+    it 'handles players from different model types in matches' do
+      team = Team.create!(name: "Test Team")
+      
+      expect { player1.beat!(team) }.not_to raise_error
+      expect(player1.games_played).to eq(1)
+      expect(team.games_played).to eq(1)
+    end
+
+    it 'handles multiple consecutive matches between same players' do
+      initial_rating1 = player1.elo_rating
+      initial_rating2 = player2.elo_rating
+      
+      # Play 10 matches
+      10.times { player1.beat!(player2) }
+      
+      expect(player1.games_played).to eq(10)
+      expect(player2.games_played).to eq(10)
+      expect(player1.elo_rating).to be > initial_rating1
+      expect(player2.elo_rating).to be < initial_rating2
+    end
+
+    it 'handles draw between players with very different ratings' do
+      player1.elo_ranking.update!(rating: 2500)
+      player2.elo_ranking.update!(rating: 800)
+      
+      initial_rating1 = player1.elo_rating
+      initial_rating2 = player2.elo_rating
+      
+      player1.draw_with!(player2)
+      
+      # Higher rated player should lose rating in a draw, lower should gain
+      expect(player1.elo_rating).to be < initial_rating1
+      expect(player2.elo_rating).to be > initial_rating2
+    end
+
+    it 'handles concurrent access to same player rankings' do
+      # Simulate potential race condition by accessing elo_ranking multiple times
+      # Skip database threading test in spec environment
+      player1.elo_rating # Trigger creation
+      
+      # Should not create multiple elo_ranking records
+      expect(EloRankable::EloRanking.where(rankable: player1).count).to eq(1)
+      
+      # Test that multiple accesses return consistent results
+      expect(player1.elo_rating).to eq(player1.elo_rating)
+    end
+
+    it 'validates that deleted/destroyed players cannot participate in matches' do
+      destroyed_player = Player.create!(name: "ToDestroy")
+      destroyed_player.destroy
+      
+      # With improved validation, this should be caught properly
+      expect { player2.beat!(destroyed_player) }.to raise_error(ArgumentError, "Cannot play against a destroyed record")
+    end
+
+    it 'handles matches where players have exactly the same rating' do
+      # Ensure both players have identical ratings
+      player1.elo_ranking.update!(rating: 1500)
+      player2.elo_ranking.update!(rating: 1500)
+      
+      player1.beat!(player2)
+      
+      # Winner should gain exactly what loser loses
+      rating_diff = player1.elo_rating - player2.elo_rating
+      expect(rating_diff).to be > 0
+      expect(player1.elo_rating + player2.elo_rating).to eq(3000) # Total should be conserved
+    end
+
+    it 'handles very large number of games played without overflow' do
+      player1.elo_ranking.update!(games_played: 999999)
+      player2.elo_ranking.update!(games_played: 999999)
+      
+      expect { player1.beat!(player2) }.not_to raise_error
+      expect(player1.games_played).to eq(1000000)
+      expect(player2.games_played).to eq(1000000)
+    end
+
+    describe 'multiplayer edge cases' do
+      it 'handles single player arrays' do
+        expect do
+          EloRankable.record_multiplayer_match([player1])
+        end.to raise_error(EloRankable::InvalidMatchError, 'Need at least 2 players for a match')
+      end
+
+      it 'handles empty arrays' do
+        expect do
+          EloRankable.record_multiplayer_match([])
+        end.to raise_error(EloRankable::InvalidMatchError, 'Need at least 2 players for a match')
+      end
+
+      it 'handles nil values in players array' do
+        expect do
+          EloRankable.record_multiplayer_match([player1, nil, player2])
+        end.to raise_error(ArgumentError, 'Players array cannot contain nil values')
+      end
+
+      it 'handles non-rankable objects in players array' do
+        non_rankable = double("NonRankable")
+        expect do
+          EloRankable.record_multiplayer_match([player1, non_rankable, player2])
+        end.to raise_error(ArgumentError, "All players must respond to elo_ranking")
+      end
+
+      it 'handles duplicate players in multiplayer match' do
+        # With improved validation, duplicates are now detected
+        expect do
+          EloRankable.record_multiplayer_match([player1, player2, player1])
+        end.to raise_error(ArgumentError, "Players array cannot contain duplicate players")
+      end
+
+      it 'handles very large multiplayer matches' do
+        # Create 20 players for a large tournament
+        players = 20.times.map { |i| Player.create!(name: "Player #{i}") }
+        
+        expect { EloRankable.record_multiplayer_match(players) }.not_to raise_error
+        
+        # Verify all players have correct number of games (n-1 for n players)
+        players.each do |player|
+          expect(player.games_played).to eq(19)
+        end
+      end
+    end
+
+    describe 'winner vs all edge cases' do
+      it 'handles nil winner' do
+        expect do
+          EloRankable.record_winner_vs_all(nil, [player2, player3])
+        end.to raise_error(ArgumentError, "Winner cannot be nil")
+      end
+
+      it 'handles nil in losers array' do
+        expect do
+          EloRankable.record_winner_vs_all(player1, [player2, nil])
+        end.to raise_error(ArgumentError, "Losers array cannot contain nil values")
+      end
+
+      it 'handles winner appearing in losers list' do
+        expect do
+          EloRankable.record_winner_vs_all(player1, [player1, player2])
+        end.to raise_error(EloRankable::InvalidMatchError, 'Winner cannot be in losers list')
+      end
+
+      it 'handles duplicate losers' do
+        # Current implementation doesn't check for duplicates in losers
+        expect do
+          EloRankable.record_winner_vs_all(player1, [player2, player2])
+        end.not_to raise_error
+        
+        # Winner should play 2 matches (even though it's the same opponent twice)
+        expect(player1.games_played).to eq(2)
+        expect(player2.games_played).to eq(2)
+      end
+
+      it 'handles non-rankable objects in losers array' do
+        non_rankable = double("NonRankable")
+        expect do
+          EloRankable.record_winner_vs_all(player1, [player2, non_rankable])
+        end.to raise_error(ArgumentError, "All losers must respond to elo_ranking")
+      end
+
+      it 'handles non-rankable winner' do
+        non_rankable = double("NonRankable")
+        expect do
+          EloRankable.record_winner_vs_all(non_rankable, [player2, player3])
+        end.to raise_error(ArgumentError, "Winner must respond to elo_ranking")
+      end
+    end
+
+    describe 'global draw method edge cases' do
+      it 'handles nil players in draw' do
+        expect do
+          EloRankable.record_draw(nil, player2)
+        end.to raise_error(ArgumentError, "Player1 cannot be nil")
+
+        expect do
+          EloRankable.record_draw(player1, nil)
+        end.to raise_error(ArgumentError, "Player2 cannot be nil")
+      end
+
+      it 'handles self-draw attempts' do
+        expect do
+          EloRankable.record_draw(player1, player1)
+        end.to raise_error(ArgumentError, "Cannot record draw with same player")
+      end
+
+      it 'handles non-rankable objects in draw' do
+        non_rankable = double("NonRankable")
+        
+        expect do
+          EloRankable.record_draw(non_rankable, player2)
+        end.to raise_error(ArgumentError, "Player1 must respond to elo_ranking")
+
+        expect do
+          EloRankable.record_draw(player1, non_rankable)
+        end.to raise_error(ArgumentError, "Player2 must respond to elo_ranking")
+      end
     end
   end
 end

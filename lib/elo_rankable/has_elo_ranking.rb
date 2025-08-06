@@ -57,6 +57,16 @@ module EloRankable
         raise ArgumentError, "Cannot play against nil" if other_player.nil?
         raise ArgumentError, "Cannot play against yourself" if other_player == self
         raise ArgumentError, "Opponent must respond to elo_ranking" unless other_player.respond_to?(:elo_ranking)
+        
+        # Check if the opponent is destroyed/deleted
+        if other_player.respond_to?(:destroyed?) && other_player.destroyed?
+          raise ArgumentError, "Cannot play against a destroyed record"
+        end
+        
+        # Get the elo_ranking once and validate it
+        opponent_ranking = other_player.elo_ranking
+        raise ArgumentError, "Opponent's elo_ranking is not initialized" if opponent_ranking.nil?
+        raise ArgumentError, "Opponent's elo_ranking is not saved" unless opponent_ranking.persisted?
       end
     end
   end
