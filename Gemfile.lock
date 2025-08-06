@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    elo_rankable (0.1.0)
+    elo_rankable (0.1.1)
       activerecord (>= 6.0, < 8.0)
       activesupport (>= 6.0, < 8.0)
 
