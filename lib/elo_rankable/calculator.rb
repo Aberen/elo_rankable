@@ -12,7 +12,7 @@ module EloRankable
       def update_ratings_for_win(winner, loser)
         winner_rating = winner.elo_ranking
         loser_rating = loser.elo_ranking
-        
+
         # Defensive validation - these should be caught earlier but just in case
         raise ArgumentError, "Winner's elo_ranking is nil" if winner_rating.nil?
         raise ArgumentError, "Loser's elo_ranking is nil" if loser_rating.nil?
@@ -35,7 +35,7 @@ module EloRankable
       def update_ratings_for_draw(player1, player2)
         player1_rating = player1.elo_ranking
         player2_rating = player2.elo_ranking
-        
+
         # Defensive validation - these should be caught earlier but just in case
         raise ArgumentError, "Player1's elo_ranking is nil" if player1_rating.nil?
         raise ArgumentError, "Player2's elo_ranking is nil" if player2_rating.nil?
