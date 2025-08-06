@@ -1,6 +1,11 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require 'rspec-benchmark'
+
+RSpec.configure do |config|
+  config.include RSpec::Benchmark::Matchers
+end
 
 RSpec.describe EloRankable do
   let(:player1) { Player.create!(name: 'Alice') }
@@ -210,6 +215,45 @@ RSpec.describe EloRankable do
 
       expect(team1.elo_rating).to be > 1200
       expect(team2.elo_rating).to be < 1200
+    end
+  end
+
+  describe 'performance' do
+    it 'leaderboard queries complete in reasonable time' do
+      # Create more players to test performance and trigger elo_ranking creation
+      players = 50.times.map { |i| Player.create!(name: "Player #{i}") }
+      
+      # Trigger elo_ranking creation for each player
+      players.each(&:elo_rating)
+
+      start_time = Time.current
+      top_players = Player.by_elo_rating.limit(10).to_a
+      end_time = Time.current
+
+      expect(top_players.size).to eq(10)
+      expect(end_time - start_time).to be < 1.0  # Should complete in under 1 second
+    end
+
+    it 'accessing elo_rating does not reload association unnecessarily' do
+      player = Player.create!(name: "Test Player")
+
+      # First access creates the ranking
+      first_ranking = player.elo_ranking
+
+      # Subsequent accesses should return the same object
+      second_ranking = player.elo_ranking
+
+      expect(first_ranking.object_id).to eq(second_ranking.object_id)
+    end
+
+    it 'leaderboard queries perform well' do
+      # Create players and ensure they have elo_rankings
+      players = 10.times.map { |i| Player.create!(name: "Player #{i}") }
+      players.each(&:elo_rating)  # Trigger elo_ranking creation
+
+      expect {
+        Player.by_elo_rating.limit(5).map(&:elo_rating)
+      }.to perform_under(100).ms
     end
   end
 end
