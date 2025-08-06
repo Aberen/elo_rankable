@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.authors = ['Aberen']
   spec.email = ['nijoergensen@gmail.com']
 
-  spec.summary = 'Add ELO rating capabilities to any ActiveRecord model'
-  spec.description = 'Adds ELO rating to any ActiveRecord model via has_elo_ranking. It stores ratings in a separate EloRanking model to keep your host model clean, and provides domain-style methods for updating rankings after matches.'
+  spec.summary = 'Add Elo rating capabilities to any ActiveRecord model'
+  spec.description = 'Adds Elo rating to any ActiveRecord model via has_elo_ranking. It stores ratings in a separate EloRanking model to keep your host model clean, and provides domain-style methods for updating rankings after matches.'
   spec.homepage = 'https://github.com/Aberen/elo_rankable'
   spec.license = 'MIT'
   spec.required_ruby_version = '>= 2.7.0'
