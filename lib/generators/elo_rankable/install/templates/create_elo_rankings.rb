@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class CreateEloRankings < ActiveRecord::Migration[6.0]
+class CreateEloRankings < ActiveRecord::Migration[<%= ActiveRecord::Migration.current_version %>]
   def change
     create_table :elo_rankings do |t|
       t.references :rankable, polymorphic: true, null: false, index: true
