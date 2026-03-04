@@ -1,7 +1,9 @@
 AllCops:
   NewCops: enable
   SuggestExtensions: false
-  TargetRubyVersion: 2.7
+  TargetRubyVersion: 3.1
+  Exclude:
+    - 'lib/generators/**/templates/**/*'
 
 # Disable some overly strict metrics for gem development
 Metrics/AbcSize:
