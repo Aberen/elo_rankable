@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - claude/test-gem-in-rails-actions
   pull_request:
     branches:
       - main
