@@ -23,8 +23,9 @@ Layout/LineLength:
 
 Metrics/BlockLength:
   Exclude:
-    - 'spec/**/*'
-    - '*.gemspec'
+    - 'spec/spec_helper.rb'
+    - 'spec/elo_rankable_spec.rb'
+    - 'elo_rankable.gemspec'
 
 # Allow longer variable names with numbers for test clarity
 Naming/VariableNumber:
