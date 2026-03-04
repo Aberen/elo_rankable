@@ -1,7 +1,9 @@
 AllCops:
   NewCops: enable
   SuggestExtensions: false
-  TargetRubyVersion: 2.7
+  TargetRubyVersion: 3.1
+  Exclude:
+    - 'lib/generators/elo_rankable/install/templates/create_elo_rankings.rb'
 
 # Disable some overly strict metrics for gem development
 Metrics/AbcSize:
@@ -21,8 +23,9 @@ Layout/LineLength:
 
 Metrics/BlockLength:
   Exclude:
-    - 'spec/**/*'
-    - '*.gemspec'
+    - 'spec/spec_helper.rb'
+    - 'spec/elo_rankable_spec.rb'
+    - 'elo_rankable.gemspec'
 
 # Allow longer variable names with numbers for test clarity
 Naming/VariableNumber:
